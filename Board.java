@@ -5,6 +5,7 @@
 package alda.fiveRow;
 
 import com.sun.org.apache.xpath.internal.SourceTree;
+import javafx.geometry.Pos;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -144,6 +145,19 @@ public class Board {
         return false;
     }
 
+    private HashSet<Position> getAllEmptyPositions(){
+        HashSet<Position> emptyPositions = new HashSet<>();
+
+        for(int y = 0; y<sizeY; y++){
+            for(int x = 0; x<sizeX; x++){
+                if(board[x][y] == '+'){
+                    emptyPositions.add(new Position(x,y));
+                }
+            }
+        }
+        return emptyPositions;
+    }
+
     private HashSet<Position> getEmptyPositions(char player){
         HashSet<Position> emptyPositions = new HashSet<>();
 
@@ -244,11 +258,16 @@ public class Board {
 
     private Position minimaxComp(char player, int depth, Position move) {   //gör senare om till alphaBetaMinimax
 
-        HashSet<Position> emptyPlaces = getEmptyPositions('O');
+        HashSet<Position> emptyPlaces = getAllEmptyPositions();
+//        HashSet<Position> emptyPlaces = getEmptyPositions('O');
+//
+//        for(Position pos : getEmptyPositions('X')){
+//            emptyPlaces.add(pos);
+//        }
 
-        if(emptyPlaces.isEmpty()){
-            emptyPlaces = getEmptyPositions('X');
-        }
+//        if(emptyPlaces.isEmpty()){
+//            emptyPlaces = getEmptyPositions('X');
+//        }
 
         if(getWinner('X')){
             move.setScore(1);
@@ -280,29 +299,35 @@ public class Board {
                 int x = pos.getX();
                 int y = pos.getY();
 
-                board[x][y] = player;
-                humanMove = minimaxHuman('O', depth - 1, pos);
-                board[x][y] = '+';
+                if(board[x][y] == '+') {
 
-                if (humanMove.getScore() > score) {
-                    score = humanMove.getScore();
-                    bestMove = new Position(x, y, score);
+                    board[x][y] = player;
+                    humanMove = minimaxHuman('O', depth - 1, pos);
+                    board[x][y] = '+';
+
+                    if (humanMove.getScore() > score) {
+                        score = humanMove.getScore();
+                        bestMove = new Position(x, y, score);
+                    }
                 }
             }
         }
-        System.out.println("Best move comp: ");
-        printBoard();
         return bestMove;
 
     }
 
     private Position minimaxHuman(char player, int depth, Position move) {
 
-        HashSet<Position> emptyPlaces = getEmptyPositions('X');
+        HashSet<Position> emptyPlaces = getAllEmptyPositions();
+//        HashSet<Position> emptyPlaces = getEmptyPositions('X');
+//
+//        for(Position pos : getEmptyPositions('O')){
+//            emptyPlaces.add(pos);
+//        }
 
-        if(emptyPlaces.isEmpty()) {
-            emptyPlaces = getEmptyPositions('O');
-        }
+//        if(emptyPlaces.isEmpty()) {
+//            emptyPlaces = getEmptyPositions('O');
+//        }
 
         if(getWinner('X')){
             move.setScore(1);
@@ -335,18 +360,18 @@ public class Board {
                 int x = pos.getX();
                 int y = pos.getY();
 
-                board[x][y] = player;
-                compMove = minimaxComp('X', depth - 1, pos);
-                board[x][y] = '+';
+                if(board[x][y] == '+') {
+                    board[x][y] = player;
+                    compMove = minimaxComp('X', depth - 1, pos);
+                    board[x][y] = '+';
 
-                if (compMove.getScore() < score) {
-                    score = compMove.getScore();
-                    bestMove = new Position(x, y, score);
+                    if (compMove.getScore() < score) {
+                        score = compMove.getScore();
+                        bestMove = new Position(x, y, score);
+                    }
                 }
             }
         }
-        System.out.println("Best move human: ");
-        printBoard();
         return bestMove;
     }
 
@@ -375,7 +400,7 @@ public class Board {
             }
 
             //Computer playing
-            Position place = minimaxComp('X', 8, new Position(0,0));
+            Position place = minimaxComp('X', 7, new Position(0,0));
             placePlayer(place.getX(), place.getY(), 'X');
 
             if(getWinner('X')){
@@ -383,16 +408,17 @@ public class Board {
                 //Computer won
                 return;
             }
-            if(terminal()){
+            if(terminal()) {
                 System.out.println("Draw");
                 return;
+
             }
         }
     }
 
     public static void main(String [] args){
 
-        Board board = new Board(3, 3);
+        Board board = new Board(4, 4);
         board.play();
 
     }
