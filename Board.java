@@ -5,7 +5,6 @@
 package alda.fiveRow;
 
 import com.sun.org.apache.xpath.internal.SourceTree;
-import javafx.geometry.Pos;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -148,6 +147,7 @@ public class Board {
     private HashSet<Position> getAllEmptyPositions(){
         HashSet<Position> emptyPositions = new HashSet<>();
 
+
         for(int y = 0; y<sizeY; y++){
             for(int x = 0; x<sizeX; x++){
                 if(board[x][y] == '+'){
@@ -277,6 +277,10 @@ public class Board {
             move.setScore(-1);
             return move;
         }
+        if(terminal()){
+            move.setScore(0);
+            return move;
+        }
 
         int score = 0;
         Position bestMove = new Position(0, 0, score);
@@ -286,11 +290,6 @@ public class Board {
             move.setScore(evaluateMove());
             return move;
         }
-
-//        if(terminal()){
-//            score = 0;
-//        }
-//        else
 
         else {
             score = -1;
@@ -319,6 +318,7 @@ public class Board {
     private Position minimaxHuman(char player, int depth, Position move) {
 
         HashSet<Position> emptyPlaces = getAllEmptyPositions();
+
 //        HashSet<Position> emptyPlaces = getEmptyPositions('X');
 //
 //        for(Position pos : getEmptyPositions('O')){
@@ -338,6 +338,11 @@ public class Board {
             return move;
         }
 
+        if(terminal()){
+           move.setScore(0);
+            return move;
+        }
+
         int score = 0;
         Position bestMove = new Position(0, 0, score);
         Position compMove;
@@ -346,11 +351,6 @@ public class Board {
             move.setScore(evaluateMove());
             return move;
         }
-//        if(terminal()){
-//            score = 0;
-//        }
-//
-//        else
 
         else {
             score = 1;
@@ -361,6 +361,7 @@ public class Board {
                 int y = pos.getY();
 
                 if(board[x][y] == '+') {
+
                     board[x][y] = player;
                     compMove = minimaxComp('X', depth - 1, pos);
                     board[x][y] = '+';
@@ -398,7 +399,6 @@ public class Board {
                 System.out.println("Draw");
                 return;
             }
-
             //Computer playing
             Position place = minimaxComp('X', 7, new Position(0,0));
             placePlayer(place.getX(), place.getY(), 'X');
@@ -408,17 +408,16 @@ public class Board {
                 //Computer won
                 return;
             }
-            if(terminal()) {
+            if(terminal()){
                 System.out.println("Draw");
                 return;
-
             }
         }
     }
 
     public static void main(String [] args){
 
-        Board board = new Board(4, 4);
+        Board board = new Board(3, 3);
         board.play();
 
     }
