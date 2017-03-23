@@ -242,23 +242,30 @@ public class Board {
         }
 
         if(compCount == 3){
-            return 10;
+            return 1;
         }
-        if(humanCount == 2 && compCount == 2){
+        if(humanCount == 3){
             return -1;
         }
-        if(compCount < humanCount){
-            return  -1;
-        }else if(compCount > humanCount){
-            return 2;
-        }else{
+
+//        if(humanCount == 2 && compCount == 2){
+//            return 0;
+//        }
+//        if(compCount < humanCount){
+//            return  -1;
+//        }else if(compCount > humanCount){
+//            return 1;
+//        }
+        else{
             return 0;
         }
     }
 
     private Position minimaxComp(char player, int depth, Position move) {   //gör senare om till alphaBetaMinimax
 
-        HashSet<Position> emptyPlaces = getAllEmptyPositions();
+//        HashSet<Position> emptyPlaces = getAllEmptyPositions();
+        HashSet<Position> emptyPlaces = getEmptyPositions('O');
+        emptyPlaces.addAll(getEmptyPositions('X'));
 //        HashSet<Position> emptyPlaces = getEmptyPositions('O');
 //
 //        for(Position pos : getEmptyPositions('X')){
@@ -284,6 +291,11 @@ public class Board {
 
         int score = 0;
         Position bestMove = new Position(0, 0, score);
+        for(Position pos : emptyPlaces){
+            pos.setScore(score);
+            bestMove = pos;
+            break;
+        }
         Position humanMove;
 
         if(depth == 0){
@@ -293,6 +305,8 @@ public class Board {
 
         else {
             score = -1;
+            boolean changed = false;
+
             for (Position pos : emptyPlaces) {
 
                 int x = pos.getX();
@@ -310,6 +324,13 @@ public class Board {
                     }
                 }
             }
+//            if(!changed){
+//                for(Position pos : emptyPlaces){
+//                    pos.setScore(0);
+//                    bestMove = pos;
+//                    break;
+//                }
+//            }
         }
         return bestMove;
 
@@ -317,8 +338,9 @@ public class Board {
 
     private Position minimaxHuman(char player, int depth, Position move) {
 
-        HashSet<Position> emptyPlaces = getAllEmptyPositions();
-
+//        HashSet<Position> emptyPlaces = getAllEmptyPositions();
+        HashSet<Position> emptyPlaces = getEmptyPositions('O');
+        emptyPlaces.addAll(getEmptyPositions('X'));
 //        HashSet<Position> emptyPlaces = getEmptyPositions('X');
 //
 //        for(Position pos : getEmptyPositions('O')){
@@ -345,6 +367,11 @@ public class Board {
 
         int score = 0;
         Position bestMove = new Position(0, 0, score);
+        for(Position pos : emptyPlaces){
+                    pos.setScore(score);
+                    bestMove = pos;
+                    break;
+                }
         Position compMove;
 
         if(depth == 0){
@@ -354,7 +381,7 @@ public class Board {
 
         else {
             score = 1;
-
+            boolean changed = false;
             for(Position pos : emptyPlaces){
 
                 int x = pos.getX();
@@ -369,9 +396,17 @@ public class Board {
                     if (compMove.getScore() < score) {
                         score = compMove.getScore();
                         bestMove = new Position(x, y, score);
+                        changed = true;
                     }
                 }
             }
+//            if(!changed){
+//                for(Position pos : emptyPlaces){
+//                    pos.setScore(0);
+//                    bestMove = pos;
+//                    break;
+//                }
+//            }
         }
         return bestMove;
     }
@@ -401,6 +436,7 @@ public class Board {
             }
             //Computer playing
             Position place = minimaxComp('X', 7, new Position(0,0));
+            System.out.println(place);
             placePlayer(place.getX(), place.getY(), 'X');
 
             if(getWinner('X')){
